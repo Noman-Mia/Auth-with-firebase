@@ -2,8 +2,11 @@ import { useContext, useState } from "react";
 import { authContext } from "./AuthProvider";
 
 const Register = () => {
-    const {registerUser} = useContext(authContext)
+
+    const {registerUser,setUser} = useContext(authContext)
     const [error, setError] = useState('')
+    const [errorEmail, setErrorEmail] = useState('')
+
     const handleRegister = (e) => {
         e.preventDefault();
       const name = e.target.name.value;
@@ -11,18 +14,29 @@ const Register = () => {
       const password = e.target.password.value;
       const confirmPassword = e.target.confirmPassword.value;
       console.log(name,email,password,confirmPassword);
+
       //set user pathabo
         registerUser(email, password)
-
-        //validation 
-        if(password > 6){
-            setError("Password should be 6 char")
+        .then(result => {
+            setUser(result.user)
+        })
+        .catch(error =>setError(error.message))
+        
+        //validation
+        if(!/@gmail\.com$/.test(email)){
+            setErrorEmail('Email must end with @gmail.com')
+            return;
+        }
+        if(password < 6){
+            setError("Password should be less than 6 char")
             return;
         }
         if(password !== confirmPassword){
             setError('Password did not match')
             return;
         }
+        setError('')
+        setErrorEmail('')
     
     }
   return (
@@ -34,6 +48,9 @@ const Register = () => {
       <label className="input input-bordered flex items-center gap-2">
         <input type="text" className="grow" placeholder="Email" name="email" />
       </label>
+      {
+        errorEmail && <small>{errorEmail}</small>
+      }
       <label className="input input-bordered flex items-center gap-2">
         <input type="text" className="grow" placeholder="Password" name="password" />
       </label>
