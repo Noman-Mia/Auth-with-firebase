@@ -1,9 +1,9 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { authContext } from "./AuthProvider";
 
 const Register = () => {
     const {registerUser} = useContext(authContext)
-
+    const [error, setError] = useState('')
     const handleRegister = (e) => {
         e.preventDefault();
       const name = e.target.name.value;
@@ -11,8 +11,19 @@ const Register = () => {
       const password = e.target.password.value;
       const confirmPassword = e.target.confirmPassword.value;
       console.log(name,email,password,confirmPassword);
-      //set user
-        registerUser(email,password)
+      //set user pathabo
+        registerUser(email, password)
+
+        //validation 
+        if(password > 6){
+            setError("Password should be 6 char")
+            return;
+        }
+        if(password !== confirmPassword){
+            setError('Password did not match')
+            return;
+        }
+    
     }
   return (
     <div>
@@ -27,9 +38,12 @@ const Register = () => {
         <input type="text" className="grow" placeholder="Password" name="password" />
       </label>
       <label className="input input-bordered flex items-center gap-2">
-        <input type="text" className="grow" placeholder="Confirm-Password" name="confirmPassword" />
+        <input type="text" className="grow" placeholder="Confirm-Password" name="confirmPassword"/>
       </label>
-      <button className="btn btn-primary w-full">Register</button>
+       {
+        error && <small>{error}</small>
+       }
+        <button className="btn btn-primary w-full">Register</button>
       </form>
     </div>
   );
