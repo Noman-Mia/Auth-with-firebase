@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
-import {createContext, useState} from 'react';
-import {createUserWithEmailAndPassword, signInWithEmailAndPassword,GoogleAuthProvider, signInWithPopup} from "firebase/auth";
+import {createContext, useEffect, useState} from 'react';
+import {createUserWithEmailAndPassword, signInWithEmailAndPassword,GoogleAuthProvider, 
+    FacebookAuthProvider, signInWithPopup, onAuthStateChanged} from "firebase/auth";
 import auth from '../Firebase/Firebase.init';
 
-export const authContext = createContext(null)
+export const AuthContext = createContext(null)
 const googleProvider = new GoogleAuthProvider();
+const facebookProvider = new FacebookAuthProvider();
 const AuthProvider = ({children}) => {
 const [user, setUser] = useState(null)
 
@@ -19,19 +21,40 @@ const loginUser = (email,password)=> {
 const googleLogin = () =>{
     return signInWithPopup(auth, googleProvider)
 }
+const facebookLogin =()=>{
+    return signInWithPopup(auth,facebookProvider)
+}
+const logOut = ()=>{
+    return logOut(auth)
+}
 const authInfo ={
     registerUser,
     loginUser,
     user,
     setUser,
-    googleLogin
+    googleLogin,
+    facebookLogin,
+    logOut
 }
+useEffect(()=>{
+   const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        if (currentUser) {
+         setUser(currentUser)
+        } else {
+         setUser(null)
+        }
+      });
+      return ()=>{
+        unsubscribe()
+      }
+      
+},[])
     return (
         <div>
             {
-                <authContext.Provider value={authInfo}>
+                <AuthContext.Provider value={authInfo}>
                      {children}
-                </authContext.Provider>
+                </AuthContext.Provider>
             }
            
         </div>

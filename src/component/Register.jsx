@@ -1,9 +1,19 @@
-import { useContext, useState } from "react";
-import { authContext } from "./AuthProvider";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "./AuthProvider";
 
 const Register = () => {
 
-    const {registerUser,setUser} = useContext(authContext)
+    useEffect(()=>{
+        const clear = setInterval(() => {
+            console.log("iam called");
+        },1000)
+
+        return ()=>{
+            clearInterval(clear)
+        }
+    },[])
+
+    const {registerUser,setUser} = useContext(AuthContext)
     const [error, setError] = useState('')
     const [errorEmail, setErrorEmail] = useState('')
 
@@ -21,7 +31,7 @@ const Register = () => {
             setUser(result.user)
         })
         .catch(error =>setError(error.message))
-        
+
         //validation
         if(!/@gmail\.com$/.test(email)){
             setErrorEmail('Email must end with @gmail.com')
